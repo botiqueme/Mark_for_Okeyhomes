@@ -1,0 +1,8 @@
+flask==3.0.2
+sqlalchemy==2.0.17
+fuzzywuzzy==0.18.0
+apscheduler==3.10.1
+openai==1.6.1
+flask-sqlalchemy==3.0.5
+pymysql==1.1.0
+pydub==0.25.1

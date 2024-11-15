@@ -1,0 +1,5 @@
+.env
+/resources/token.json
+/resources/credentials.json
+/resources/certificate.pem
+/resources/users.json

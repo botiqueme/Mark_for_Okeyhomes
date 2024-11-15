@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Statistiche Chatbot</title>
+    <style>
+        .conversation {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Statistiche Chatbot</h1>
+    <div>
+        <p><strong>Numero Totale di Messaggi:</strong> {{ stats.total_messages }}</p>
+        <p><strong>Numero di Conversazioni:</strong> {{ stats.num_conversations }}</p>
+        <p><strong>Media dei Messaggi per Conversazione:</strong> {{ stats.avg_messages_per_conversation }}</p>
+        <p><strong>Lunghezza della Conversazione più Lunga:</strong> {{ stats.longest_conversation }}</p>
+        <p><strong>Lunghezza della Conversazione più Corta:</strong> {{ stats.shortest_conversation }}</p>
+    </div>
+
+    <h2>Conversazioni del Chatbot Organizzate per Thread ID</h2>
+    {% for thread_id, convo in conversations.items() %}
+        <div class="thread">
+            <button onclick="toggleConversation('convo{{ loop.index }}')">+</button>
+            <span>Thread: {{ thread_id }} Date: {{ thread_dates[thread_id] }}</span>
+            <div id="convo{{ loop.index }}" class="conversation">
+                <ul>
+                    {% for user_msg, bot_msg in convo %}
+                        <li><strong>User:</strong> {{ user_msg }}</li>
+                        <li><strong>Bot:</strong> {{ bot_msg }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endfor %}
+
+    <script>
+        function toggleConversation(convoId) {
+            var convo = document.getElementById(convoId);
+            if (convo.style.display === 'none') {
+                convo.style.display = 'block';
+            } else {
+                convo.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

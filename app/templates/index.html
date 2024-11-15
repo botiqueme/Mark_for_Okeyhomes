@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ChatBot</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+<!-- partial:index.partial.html -->
+<section class="msger">
+    <header class="msger-header">
+        <div class="icon_logo_bubble" style="background-image: url('/static/images/logo.png');"></div>
+        <div class="msger-header-title">Mark @Okey Host
+            <div class="online">
+                <div class="online_bubble"></div>
+                Online
+            </div>
+        </div>
+        {#        <div class="btn_new_reg"#}
+        {#             style="background-image: url('/static/images/plus_icon.png');"#}
+        {#             onclick="window.location.href='/new_registration';">#}
+        {#        </div>#}
+    </header>
+
+    <main class="msger-chat">
+        <div class="msg left-msg">
+            <div class="msg-img" style="background-image: url('/static/images/bot_icon.png');"></div>
+
+
+            <div class="msg-bubble">
+                <div class="msg-info">
+                    <div class="msg-info-name">Mark</div>
+                    <div class="msg-info-time"></div>
+                </div>
+                <div class="msg-text">
+                    &#128075; Ciao! Sono Mark, l'assistente commerciale virtuale di Okey Host. Posso aiutarti a capire
+                    come funziona il property management e illustrare i vantaggi di affidare il tuo immobile a Okey
+                    Host. Ti posso anche fornire i contatti per richiedere un appuntamento con l'azienda. Come posso
+                    assisterti ulteriormente oggi?
+                </div>
+
+            </div>
+
+
+    </main>
+    <div class="typing_dots" style="display: none">
+        <div class="msg-img" style="background-image: url('/static/images/bot_icon.png');"></div>
+        <img class="dots" src="{{ url_for('static', filename='images/typing.gif') }}" alt="Typing">
+
+    </div>
+    <form class="msger-inputarea" autocomplete="off">
+        <input type="text" class="msger-input" id="textInput" placeholder="Inserisci il messaggio...">
+        <button type="submit" class="round-button"><img src="{{ url_for('static', filename='images/send.png') }}">
+        </button>
+        {#        <button id="recordButton" onmousedown="startRecording()" onmouseup="stopRecording()" class="round-button">#}
+        {#            <img src="{{ url_for('static', filename='images/record_icon.png') }}">#}
+        {#        </button>#}
+    </form>
+</section>
+
+<!-- partial -->
+<script src='https://use.fontawesome.com/releases/v5.0.13/js/all.js'></script>
+<script src="{{ url_for('static', filename='scripts/audiorec.js') }}"></script>
+<script>
+
+    const msgerForm = get(".msger-inputarea");
+    const msgerInput = get(".msger-input");
+    const msgerChat = get(".msger-chat");
+
+
+    // Icons made by Freepik from www.flaticon.com
+    const BOT_IMG = "static/images/bot_icon.png";
+    const PERSON_IMG = "static/images/you_icon.png";
+    const BOT_NAME = "Mark";
+    const PERSON_NAME = "Tu";
+
+    msgerForm.addEventListener("submit", event => {
+        event.preventDefault();
+
+        const msgText = msgerInput.value;
+        if (!msgText) return;
+
+        scrollToBottom();
+
+        appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
+        msgerInput.value = "";
+        botResponse(msgText);
+    });
+
+    function appendMessage(name, img, side, text) {
+        //   Simple solution for small apps
+        const msgHTML = `
+<div class="msg ${side}-msg">
+  <div class="msg-img" style="background-image: url(${img})"></div>
+
+  <div class="msg-bubble">
+    <div class="msg-info">
+      <div class="msg-info-name">${name}</div>
+      <div class="msg-info-time">${formatDate(new Date())}</div>
+    </div>
+
+    <div class="msg-text">${text}</div>
+  </div>
+</div>
+`;
+
+        msgerChat.insertAdjacentHTML("beforeend", msgHTML);
+        msgerChat.scrollTop += 500;
+    }
+
+    function appendForm() {
+        const formHTML = `<div id="appointmentForm">
+    <!-- Qui inserisci il form per prendere un appuntamento -->
+    <form id="appointmentFormInner">
+        <!-- Campo per il Nome -->
+        <input type="text" name="nome" placeholder="Nome..." required>
+
+        <!-- Campo per l'Email -->
+        <input type="email" name="email" placeholder="Email..." required>
+
+        <!-- Campo per il Numero di Telefono -->
+        <input type="tel" name="telefono" placeholder="Numero di telefono..." required>
+
+        <select name="fasciaOraria" required>
+            <option value="">Seleziona una fascia oraria...</option>
+            <option value="9-12">9-12</option>
+            <option value="12-15">12-15</option>
+            <option value="15-19">15-19</option>
+        </select>
+
+        <!-- Pulsante per Inviare il Form -->
+        <input type="submit" value="Prenota contatto">
+        <p id="gdprInfo">In conformità al Regolamento (UE) 2016/679 del Parlamento europeo e del Consiglio,
+del 27 aprile 2016, relativo alla protezione delle persone fisiche con riguardo al trattamento dei dati personali,
+nonché alla libera circolazione di tali dati (c.d. GDPR), ti informiamo che i tuoi dati personali saranno trattati da
+Botique.me per le seguenti finalità: ricontattare l'utente che ha richiesto di essere contattato in chat.”</p>
+    </form>
+</div>`;
+        msgerChat.insertAdjacentHTML("beforeend", formHTML);
+        msgerChat.scrollTop += 500;
+
+        document.getElementById("appointmentFormInner").addEventListener("submit", function (event) {
+            event.preventDefault();
+            document.getElementById("appointmentForm").remove();
+            {#document.getElementById("appointmentForm").style.display = 'none';#}
+
+            appendMessage(BOT_NAME, BOT_IMG, "left", "Grazie! Ti ricontatteremo nelle prossime 24 ore.");
+        });
+    }
+
+
+    function botResponse(rawText) {
+        // Mostra l'animazione di digitazione
+        document.querySelector('.typing_dots').style.display = 'flex';
+
+        // Bot Response
+        $.get("/api/v1/get", {msg: rawText}).done(function (data) {
+            // Nascondi l'animazione di digitazione
+            document.querySelector('.typing_dots').style.display = 'none';
+
+            console.log(rawText);
+            console.log(data);
+
+            data = JSON.parse(data);
+
+            {#console.log(data);#}
+
+            // Controlla se la risposta indica di mostrare il form
+
+
+            {#data = JSON.parse(data);#}
+            // Controlla se la risposta è vuota
+            if (!data || (Array.isArray(data) && data.length === 0)) {
+                // Se è vuota o un array vuoto, non fare nulla (non mostrare messaggi)
+                return;
+            }
+
+            // Controlla se la risposta è un array
+            if (Array.isArray(data)) {
+                // Filtra elementi null dall'array
+                let filteredData = data.filter(msg => msg != null);
+
+                // Se dopo il filtro l'array è vuoto, non fare nulla
+                if (filteredData.length === 0) {
+                    return;
+                }
+
+                // Altrimenti, elabora ogni elemento non-null dell'array
+                filteredData.forEach(msg => {
+                    appendMessage(BOT_NAME, BOT_IMG, "left", msg);
+                });
+            } else {
+                // Se non è un array, elabora normalmente
+                // Se e un Bool True, mostra il form di contatto
+                if (data === true) {
+
+                    appendMessage(BOT_NAME, BOT_IMG, "left", "Per poterti contattare, abbiamo bisogno dei seguenti dati");
+                    appendForm();
+                    return;
+                }
+                appendMessage(BOT_NAME, BOT_IMG, "left", data);
+            }
+        });
+    }
+
+    function scrollToBottom() {
+        const chat = document.querySelector('.msger-chat');
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+
+    // Utils
+    function get(selector, root = document) {
+        return root.querySelector(selector);
+    }
+
+    function formatDate(date) {
+        const h = "0" + date.getHours();
+        const m = "0" + date.getMinutes();
+
+        return `${h.slice(-2)}:${m.slice(-2)}`;
+    }
+
+
+</script>
+
+</body>
+
+</html>
